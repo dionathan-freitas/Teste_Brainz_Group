@@ -20,13 +20,42 @@ public class StudentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<StudentDto>>> GetStudents()
+    public async Task<ActionResult<object>> GetStudents(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? search = null,
+        [FromQuery] string? department = null)
     {
-        var students = await _db.Students
+        var query = _db.Students.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchLower = search.ToLower();
+            query = query.Where(s => s.DisplayName.ToLower().Contains(searchLower) ||
+                                     s.Email.ToLower().Contains(searchLower));
+        }
+
+        if (!string.IsNullOrWhiteSpace(department))
+        {
+            query = query.Where(s => s.Department != null && s.Department.ToLower() == department.ToLower());
+        }
+
+        var total = await query.CountAsync();
+        var students = await query
             .OrderBy(s => s.DisplayName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(s => s.ToDto())
             .ToListAsync();
-        return Ok(students);
+
+        return Ok(new
+        {
+            Data = students,
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = total,
+            TotalPages = (int)Math.Ceiling(total / (double)pageSize)
+        });
     }
 
     [HttpGet("{id}/events")]

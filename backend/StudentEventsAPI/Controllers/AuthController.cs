@@ -25,7 +25,6 @@ public class AuthController : ControllerBase
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
         if (user == null) return Unauthorized();
 
-        // simple SHA256 verification (for bootstrap only)
         var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(request.Password)));
         if (!string.Equals(hash, user.PasswordHash, StringComparison.OrdinalIgnoreCase))
         {

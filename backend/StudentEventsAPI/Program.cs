@@ -12,7 +12,6 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -39,17 +38,14 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Hangfire (Background Jobs)
 var hangfireConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddHangfire(config =>
     config.UseSqlServerStorage(hangfireConnection));
 builder.Services.AddHangfireServer();
 
-// Authentication - JWT
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection.GetValue<string>("Key") ?? "";
 var jwtIssuer = jwtSection.GetValue<string>("Issuer") ?? "";
@@ -77,7 +73,6 @@ builder.Services
         };
     });
 
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -89,13 +84,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-// App Services
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IGraphSyncService, GraphSyncService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -109,17 +102,14 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseHangfireDashboard("/jobs");
 
-// Run migrations and seed basic data
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    // Apply migrations when available; otherwise ensure database
     if (db.Database.GetPendingMigrations().Any() || db.Database.GetMigrations().Any())
         db.Database.Migrate();
     else
         db.Database.EnsureCreated();
 
-    // Seed a default admin user (simple hashing for bootstrap)
     if (!db.Users.Any())
     {
         var username = "admin";
@@ -130,7 +120,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Recurring job (hourly students sync)
 RecurringJob.AddOrUpdate<IGraphSyncService>("sync-students", svc => svc.SyncStudentsAsync(CancellationToken.None), Cron.Hourly);
 
 app.Run();
