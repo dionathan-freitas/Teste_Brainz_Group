@@ -2,7 +2,7 @@
 
 Sistema de gerenciamento de estudantes e eventos integrado com Microsoft Graph API.
 
-## 🚀 Tecnologias
+##  Tecnologias
 
 ### Frontend
 - React 18
@@ -89,8 +89,66 @@ Próximas seções (Front-end, sync Graph, testes) serão adicionadas conforme i
 |--------|------|-----------|------|
 | GET | /health | Verifica status da API | Livre |
 | POST | /api/auth/login | Autentica e retorna JWT | Livre |
-| GET | /api/students | Lista estudantes | Bearer |
-| GET | /api/students/{id}/events | Eventos de um estudante | Bearer |
+| GET | /api/students | Lista estudantes paginada | Bearer |
+| GET | /api/students/{id}/events | Todos os eventos do estudante | Bearer |
+| GET | /api/events | Lista global de eventos (paginado) | Bearer |
+| POST | /api/sync/students | Força sync de usuários Graph | Admin |
+| POST | /api/sync/events | Força sync de eventos Graph | Admin |
+
+### Parâmetros de Paginação & Filtros
+
+Students (`GET /api/students`):
+```
+page (int >=1)
+pageSize (int >=1)
+search (opcional) - nome ou email (contains)
+department (opcional) - match exato do departamento
+```
+
+Events (`GET /api/events`):
+```
+page, pageSize (obrigatórios)
+studentId (opcional) - restringe a um estudante
+start (opcional, ISO 8601) - filtra início >= start
+end (opcional, ISO 8601)   - filtra fim <= end
+search (opcional) - busca em subject ou location
+```
+
+Exemplo:
+```
+GET /api/events?page=1&pageSize=20&start=2025-01-01&end=2025-01-31&search=reunião
+```
+
+Student Events (`GET /api/students/{id}/events`): retorna todos os eventos do estudante ordenados por data ascendente (sem paginação ainda, otimização futura possível).
+
+### Sincronização Manual vs Automática
+- Automática: Hangfire job `sync-students` executa de hora em hora (`Cron.Hourly`). Pode ser ajustado em `Program.cs`.
+- Manual: endpoints `/api/sync/students` e `/api/sync/events` (requer usuário com role Admin). Útil para testes ou após alterar a janela de sincronização.
+
+### Janela de Sincronização de Eventos
+Configurável em `appsettings.json` (seção `Sync`) ou via outros providers:
+```
+"Sync": {
+	"MonthsPast": 1,
+	"MonthsFuture": 3
+}
+```
+GraphSyncService buscará eventos dentro de `[UtcNow - MonthsPast .. UtcNow + MonthsFuture]`.
+
+### Segurança do Dashboard Hangfire
+- Rota: `/jobs`
+- Protegido por filtro que exige usuário autenticado com role `Admin`.
+Adicionar autorização ao chamar: incluir header `Authorization: Bearer <token-admin>`.
+
+### Migrations & Evolução de Schema
+- Primeira migration: `InitialCreate` já gerada.
+- Aplicação chama `Database.MigrateAsync()` em startup (DataSeeder).
+- Nova alteração de modelo:
+```
+dotnet ef migrations add AddCampoX
+dotnet ef database update
+```
+Commitar a migration para manter histórico.
 
 ## 🔁 Sincronização – Esqueleto Implementado
 
