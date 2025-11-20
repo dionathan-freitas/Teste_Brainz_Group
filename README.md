@@ -25,10 +25,32 @@ Sistema de gerenciamento de estudantes e eventos integrado com Microsoft Graph A
 - Sincronização automática com Microsoft Graph
 
 ## 🔧 Como executar
-### Backend (primeiro passo)
+
+### Pré-requisitos
+- Docker Desktop instalado e rodando
+- .NET 8 SDK
+
+### 1. Banco de Dados (SQL Server via Docker)
+
+Na raiz do projeto:
+```powershell
+docker-compose up -d
+```
+
+Isso iniciará SQL Server 2022 em `localhost:1433` com:
+- User: `sa`
+- Password: `@Password123`
+- Database: será criada automaticamente pela API
+
+Para parar o container:
+```powershell
+docker-compose down
+```
+
+### 2. Backend API
 
 1. Acesse a pasta da API:
-```
+```powershell
 cd backend/StudentEventsAPI
 ```
 2. (Opcional) Configure user-secrets para não expor credenciais em `appsettings.json`:
@@ -38,9 +60,10 @@ dotnet user-secrets set "Jwt:Key" "<sua-chave-forte>"
 dotnet user-secrets set "MicrosoftGraph:ClientId" "2936bb04-ca85-47ae-b117-0330aac01d5d"
 dotnet user-secrets set "MicrosoftGraph:ClientSecret" "Ik68Q~yz03c7LZQIWy3IvlF1Pl8OPePzCmklRb43"
 dotnet user-secrets set "MicrosoftGraph:TenantId" "302de125-622a-4ac3-a029-4431603ffed3"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=StudentEventsDB;User Id=sa;Password=@Password123;TrustServerCertificate=true;MultipleActiveResultSets=true"
 ```
 3. Executar a API:
-```
+```powershell
 dotnet run
 ```
 4. Testar saúde:
