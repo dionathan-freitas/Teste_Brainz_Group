@@ -11,6 +11,7 @@ using StudentEventsAPI.Services.GraphSync;
 using StudentEventsAPI.Services.Events;
 using StudentEventsAPI.Services.Students;
 using StudentEventsAPI.Infrastructure;
+using StudentEventsAPI.Services.Infrastructure;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,6 +93,7 @@ builder.Services.AddScoped<IGraphSyncService, GraphSyncService>();
 builder.Services.AddScoped<IEventListingService, EventListingService>();
 builder.Services.AddScoped<IStudentListingService, StudentListingService>();
 builder.Services.AddScoped<IStudentEventsService, StudentEventsService>();
+builder.Services.AddScoped<IDataSeeder, DataSeeder>();
 
 var app = builder.Build();
 
@@ -113,20 +115,8 @@ app.UseHangfireDashboard("/jobs", new Hangfire.DashboardOptions
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (db.Database.GetPendingMigrations().Any() || db.Database.GetMigrations().Any())
-        db.Database.Migrate();
-    else
-        db.Database.EnsureCreated();
-
-    if (!db.Users.Any())
-    {
-        var username = "admin";
-        var password = "admin123";
-        var passwordHash = Convert.ToHexString(System.Security.Cryptography.SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(password)));
-        db.Users.Add(new User { Username = username, PasswordHash = passwordHash, Role = "Admin" });
-        db.SaveChanges();
-    }
+    var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
+    await seeder.SeedAsync();
 }
 
 RecurringJob.AddOrUpdate<IGraphSyncService>("sync-students", svc => svc.SyncStudentsAsync(CancellationToken.None), Cron.Hourly);
