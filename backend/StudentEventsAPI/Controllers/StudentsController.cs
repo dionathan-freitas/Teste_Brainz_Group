@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using StudentEventsAPI.Data;
 using StudentEventsAPI.DTOs;
-using StudentEventsAPI.Services.Mappings;
+using StudentEventsAPI.Services.Students;
 
 namespace StudentEventsAPI.Controllers;
 
@@ -12,12 +10,10 @@ namespace StudentEventsAPI.Controllers;
 [Authorize]
 public class StudentsController : ControllerBase
 {
-    private readonly ApplicationDbContext _db;
-
-    public StudentsController(ApplicationDbContext db)
-    {
-        _db = db;
-    }
+    private readonly IStudentListingService _listing;
+    private readonly IStudentEventsService _events;
+    public StudentsController(IStudentListingService listing, IStudentEventsService events)
+    { _listing = listing; _events = events; }
 
     [HttpGet]
     public async Task<ActionResult<object>> GetStudents(
@@ -26,55 +22,15 @@ public class StudentsController : ControllerBase
         [FromQuery] string? search = null,
         [FromQuery] string? department = null)
     {
-        var query = _db.Students.AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var searchLower = search.ToLower();
-            query = query.Where(s => s.DisplayName.ToLower().Contains(searchLower) ||
-                                     s.Email.ToLower().Contains(searchLower));
-        }
-
-        if (!string.IsNullOrWhiteSpace(department))
-        {
-            query = query.Where(s => s.Department != null && s.Department.ToLower() == department.ToLower());
-        }
-
-        var total = await query.CountAsync();
-        var students = await query
-            .OrderBy(s => s.DisplayName)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(s => s.ToDto())
-            .ToListAsync();
-
-        return Ok(new
-        {
-            Data = students,
-            Page = page,
-            PageSize = pageSize,
-            TotalCount = total,
-            TotalPages = (int)Math.Ceiling(total / (double)pageSize)
-        });
+        var result = await _listing.GetStudentsAsync(page, pageSize, search, department);
+        return Ok(result);
     }
 
     [HttpGet("{id}/events")]
     public async Task<ActionResult<object>> GetStudentEvents(string id)
     {
-        var student = await _db.Students
-            .Include(s => s.Events)
-            .FirstOrDefaultAsync(s => s.Id == id);
-
-        if (student == null) return NotFound();
-
-        var eventsList = student.Events
-            .OrderBy(e => e.StartDateTime)
-            .Select(e => e.ToDto())
-            .ToList();
-
-        return Ok(new {
-            Student = student.ToDto(),
-            Events = eventsList
-        });
+        var result = await _events.GetStudentEventsAsync(id);
+        if (result == null) return NotFound();
+        return Ok(new { result.Value.Student, Events = result.Value.Events });
     }
 }

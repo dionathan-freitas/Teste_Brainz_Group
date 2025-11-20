@@ -9,6 +9,7 @@ using StudentEventsAPI.Models;
 using StudentEventsAPI.Services;
 using StudentEventsAPI.Services.GraphSync;
 using StudentEventsAPI.Services.Events;
+using StudentEventsAPI.Services.Students;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,6 +89,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IGraphSyncService, GraphSyncService>();
 builder.Services.AddScoped<IEventListingService, EventListingService>();
+builder.Services.AddScoped<IStudentListingService, StudentListingService>();
+builder.Services.AddScoped<IStudentEventsService, StudentEventsService>();
 
 var app = builder.Build();
 
