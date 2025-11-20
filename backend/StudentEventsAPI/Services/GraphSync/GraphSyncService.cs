@@ -31,7 +31,6 @@ public class GraphSyncService : IGraphSyncService
 
     public async Task SyncStudentsAsync(CancellationToken cancellationToken = default)
     {
-        // Basic retrieval of users (filtering to those with mail)
         var users = await Client.Users.GetAsync(requestConfiguration =>
         {
             requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "mail", "department" };
@@ -67,9 +66,70 @@ public class GraphSyncService : IGraphSyncService
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    public Task SyncEventsAsync(CancellationToken cancellationToken = default)
+    public async Task SyncEventsAsync(CancellationToken cancellationToken = default)
     {
-        // Placeholder for events sync (calendar)
-        return Task.CompletedTask;
+        var students = await _db.Students.ToListAsync(cancellationToken);
+
+        foreach (var student in students)
+        {
+            if (string.IsNullOrEmpty(student.GraphUserId)) continue;
+
+            try
+            {
+                var startDate = DateTime.UtcNow.AddMonths(-1);
+                var endDate = DateTime.UtcNow.AddMonths(3);
+
+                var events = await Client.Users[student.GraphUserId].Calendar.CalendarView
+                    .GetAsync(requestConfiguration =>
+                    {
+                        requestConfiguration.QueryParameters.StartDateTime = startDate.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                        requestConfiguration.QueryParameters.EndDateTime = endDate.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                        requestConfiguration.QueryParameters.Select = new[] { "id", "subject", "start", "end", "location", "body", "isOnlineMeeting" };
+                        requestConfiguration.QueryParameters.Top = 100;
+                    }, cancellationToken);
+
+                if (events?.Value == null) continue;
+
+                foreach (var evt in events.Value)
+                {
+                    if (evt.Start?.DateTime == null || evt.End?.DateTime == null) continue;
+
+                    var existing = await _db.Events.FirstOrDefaultAsync(
+                        e => e.GraphEventId == evt.Id && e.StudentId == student.Id, 
+                        cancellationToken);
+
+                    if (existing == null)
+                    {
+                        _db.Events.Add(new StudentEventsAPI.Models.Event
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            GraphEventId = evt.Id,
+                            StudentId = student.Id,
+                            Subject = evt.Subject ?? string.Empty,
+                            StartDateTime = DateTime.Parse(evt.Start.DateTime),
+                            EndDateTime = DateTime.Parse(evt.End.DateTime),
+                            Location = evt.Location?.DisplayName,
+                            Body = evt.Body?.Content,
+                            IsOnlineMeeting = evt.IsOnlineMeeting ?? false
+                        });
+                    }
+                    else
+                    {
+                        existing.Subject = evt.Subject ?? existing.Subject;
+                        existing.StartDateTime = DateTime.Parse(evt.Start.DateTime);
+                        existing.EndDateTime = DateTime.Parse(evt.End.DateTime);
+                        existing.Location = evt.Location?.DisplayName ?? existing.Location;
+                        existing.Body = evt.Body?.Content ?? existing.Body;
+                        existing.IsOnlineMeeting = evt.IsOnlineMeeting ?? existing.IsOnlineMeeting;
+                    }
+                }
+
+                await _db.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception)
+            {
+                continue;
+            }
+        }
     }
 }

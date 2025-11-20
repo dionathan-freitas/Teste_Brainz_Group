@@ -32,6 +32,8 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Subject).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.GraphEventId).HasMaxLength(100);
+            entity.HasIndex(e => e.GraphEventId);
             
             entity.HasOne(e => e.Student)
                   .WithMany(s => s.Events)
