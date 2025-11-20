@@ -12,6 +12,7 @@ using StudentEventsAPI.Services.Events;
 using StudentEventsAPI.Services.Students;
 using StudentEventsAPI.Infrastructure;
 using StudentEventsAPI.Services.Infrastructure;
+using StudentEventsAPI.Options;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -94,6 +95,7 @@ builder.Services.AddScoped<IEventListingService, EventListingService>();
 builder.Services.AddScoped<IStudentListingService, StudentListingService>();
 builder.Services.AddScoped<IStudentEventsService, StudentEventsService>();
 builder.Services.AddScoped<IDataSeeder, DataSeeder>();
+builder.Services.Configure<SyncOptions>(builder.Configuration.GetSection("Sync"));
 
 var app = builder.Build();
 

@@ -53,15 +53,16 @@ docker-compose down
 ```powershell
 cd backend/StudentEventsAPI
 ```
-2. (Opcional) Configure user-secrets para não expor credenciais em `appsettings.json`:
+2. Configure user-secrets (obrigatório em dev – valores foram removidos de `appsettings.json`):
 ```
 dotnet user-secrets init
 dotnet user-secrets set "Jwt:Key" "<sua-chave-forte>"
-dotnet user-secrets set "MicrosoftGraph:ClientId" "2936bb04-ca85-47ae-b117-0330aac01d5d"
-dotnet user-secrets set "MicrosoftGraph:ClientSecret" "Ik68Q~yz03c7LZQIWy3IvlF1Pl8OPePzCmklRb43"
-dotnet user-secrets set "MicrosoftGraph:TenantId" "302de125-622a-4ac3-a029-4431603ffed3"
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=StudentEventsDB;User Id=sa;Password=@Password123;TrustServerCertificate=true;MultipleActiveResultSets=true"
+dotnet user-secrets set "MicrosoftGraph:ClientId" "<client-id>"
+dotnet user-secrets set "MicrosoftGraph:ClientSecret" "<client-secret>"
+dotnet user-secrets set "MicrosoftGraph:TenantId" "<tenant-id>"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=StudentEventsDB;User Id=sa;Password=<SuaSenhaForte>;TrustServerCertificate=true;MultipleActiveResultSets=true"
 ```
+Se qualquer chave permanecer como `__SECRET__` em runtime a aplicação poderá falhar nas operações que dependem da configuração (JWT ou Graph).
 3. Executar a API:
 ```powershell
 dotnet run

@@ -3,6 +3,8 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.EntityFrameworkCore;
 using StudentEventsAPI.Data;
+using StudentEventsAPI.Options;
+using Microsoft.Extensions.Options;
 
 namespace StudentEventsAPI.Services.GraphSync;
 
@@ -11,11 +13,15 @@ public class GraphSyncService : IGraphSyncService
     private readonly ApplicationDbContext _db;
     private readonly IConfiguration _config;
     private GraphServiceClient? _client;
+    private readonly SyncOptions _options;
 
-    public GraphSyncService(ApplicationDbContext db, IConfiguration config)
+    public GraphSyncService(ApplicationDbContext db, IConfiguration config, IOptions<SyncOptions> options)
     {
         _db = db;
         _config = config;
+        _options = options.Value;
+        if (_options.MonthsPast < 0) _options.MonthsPast = 0;
+        if (_options.MonthsFuture < 0) _options.MonthsFuture = 0;
     }
 
     private GraphServiceClient Client => _client ??= CreateClient();
@@ -76,8 +82,8 @@ public class GraphSyncService : IGraphSyncService
 
             try
             {
-                var startDate = DateTime.UtcNow.AddMonths(-1);
-                var endDate = DateTime.UtcNow.AddMonths(3);
+                var startDate = DateTime.UtcNow.AddMonths(-_options.MonthsPast);
+                var endDate = DateTime.UtcNow.AddMonths(_options.MonthsFuture);
 
                 var events = await Client.Users[student.GraphUserId].Calendar.CalendarView
                     .GetAsync(requestConfiguration =>
