@@ -17,7 +17,7 @@ Sistema de gerenciamento de estudantes e eventos integrado com Microsoft Graph A
 - JWT Authentication
 - Hangfire (sincronização periódica)
 
-## 📋 Funcionalidades
+##  Funcionalidades
 
 - Autenticação de usuários
 - Listagem de estudantes
@@ -150,7 +150,7 @@ dotnet ef database update
 ```
 Commitar a migration para manter histórico.
 
-## 🔁 Sincronização – Esqueleto Implementado
+##  Sincronização – Esqueleto Implementado
 
 Status:
 - Serviço `GraphSyncService` criado (sincroniza usuários do Microsoft Graph -> Students)
@@ -171,9 +171,34 @@ Planejado para eventos:
 
 Frequência (temporária): hourly via `Cron.Hourly` – poderá ser ajustada conforme necessidade.
 
-## 📝 Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```
 /frontend - Aplicação React
 /backend  - API .NET 8
+/backend/StudentEventsAPI.Tests - Projeto de testes (xUnit)
+```
+
+##  Testes
+
+### Backend
+Executar todos os testes:
+```powershell
+dotnet test
+```
+Gerar relatório TRX para CI:
+```powershell
+dotnet test --logger "trx;LogFileName=test_results.trx"
+```
+Estratégia de cobertura inicial:
+- `TokenService` (formato e claims do JWT)
+- `StudentListingService` (paginação + filtros search/department)
+- `EventListingService` (filtros de data, studentId, search e ordenação ascendente)
+- `StudentEventsService` (ordenar eventos de um estudante)
+
+Para adicionar novos testes de schema ou lógica:
+```powershell
+dotnet ef migrations add NovaAlteracao
+dotnet ef database update
+dotnet test
 ```

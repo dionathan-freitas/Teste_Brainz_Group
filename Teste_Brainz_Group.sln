@@ -6,6 +6,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{1AE8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentEventsAPI", "backend\StudentEventsAPI\StudentEventsAPI.csproj", "{1216A040-DF0E-1B6F-1F57-6458F6405C60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentEventsAPI.Tests", "backend\StudentEventsAPI.Tests\StudentEventsAPI.Tests.csproj", "{E3B2A2D1-5F4A-4E4A-9D66-5C8E4E9A9B11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,12 +18,17 @@ Global
 		{1216A040-DF0E-1B6F-1F57-6458F6405C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1216A040-DF0E-1B6F-1F57-6458F6405C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1216A040-DF0E-1B6F-1F57-6458F6405C60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3B2A2D1-5F4A-4E4A-9D66-5C8E4E9A9B11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3B2A2D1-5F4A-4E4A-9D66-5C8E4E9A9B11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3B2A2D1-5F4A-4E4A-9D66-5C8E4E9A9B11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3B2A2D1-5F4A-4E4A-9D66-5C8E4E9A9B11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1216A040-DF0E-1B6F-1F57-6458F6405C60} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
+		{E3B2A2D1-5F4A-4E4A-9D66-5C8E4E9A9B11} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AECCB16D-E065-45B7-9B91-64B3FD639767}
