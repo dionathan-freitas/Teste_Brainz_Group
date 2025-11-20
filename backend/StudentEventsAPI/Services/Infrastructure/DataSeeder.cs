@@ -11,10 +11,7 @@ public class DataSeeder : IDataSeeder
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
-        if (_db.Database.GetPendingMigrations().Any() || _db.Database.GetMigrations().Any())
-            await _db.Database.MigrateAsync(cancellationToken);
-        else
-            await _db.Database.EnsureCreatedAsync(cancellationToken);
+        await _db.Database.MigrateAsync(cancellationToken);
 
         if (!_db.Users.Any())
         {
