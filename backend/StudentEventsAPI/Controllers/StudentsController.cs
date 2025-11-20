@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentEventsAPI.Data;
+using StudentEventsAPI.DTOs;
+using StudentEventsAPI.Services.Mappings;
 
 namespace StudentEventsAPI.Controllers;
 
@@ -18,17 +20,17 @@ public class StudentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetStudents()
+    public async Task<ActionResult<IEnumerable<StudentDto>>> GetStudents()
     {
         var students = await _db.Students
             .OrderBy(s => s.DisplayName)
-            .Select(s => new { s.Id, s.DisplayName, s.Email, s.Department, s.LastSyncDate })
+            .Select(s => s.ToDto())
             .ToListAsync();
         return Ok(students);
     }
 
     [HttpGet("{id}/events")]
-    public async Task<IActionResult> GetStudentEvents(string id)
+    public async Task<ActionResult<object>> GetStudentEvents(string id)
     {
         var student = await _db.Students
             .Include(s => s.Events)
@@ -38,10 +40,12 @@ public class StudentsController : ControllerBase
 
         var eventsList = student.Events
             .OrderBy(e => e.StartDateTime)
-            .Select(e => new {
-                e.Id, e.Subject, e.StartDateTime, e.EndDateTime, e.Location, e.IsOnlineMeeting
-            });
+            .Select(e => e.ToDto())
+            .ToList();
 
-        return Ok(new { student.Id, student.DisplayName, student.Email, Events = eventsList });
+        return Ok(new {
+            Student = student.ToDto(),
+            Events = eventsList
+        });
     }
 }
