@@ -10,6 +10,7 @@ using StudentEventsAPI.Services;
 using StudentEventsAPI.Services.GraphSync;
 using StudentEventsAPI.Services.Events;
 using StudentEventsAPI.Services.Students;
+using StudentEventsAPI.Infrastructure;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -105,7 +106,10 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseHangfireDashboard("/jobs");
+app.UseHangfireDashboard("/jobs", new Hangfire.DashboardOptions
+{
+    Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+});
 
 using (var scope = app.Services.CreateScope())
 {
