@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Backend
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.pdb
+*.db
+*.db-shm
+*.db-wal
+
+# Database
+*.mdf
+*.ldf
+*.pdf
