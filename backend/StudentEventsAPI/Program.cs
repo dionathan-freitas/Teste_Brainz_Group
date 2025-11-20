@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Hangfire;
+using Hangfire.SqlServer;
 using System.Text;
 using StudentEventsAPI.Data;
 using StudentEventsAPI.Models;
+using StudentEventsAPI.Services;
+using StudentEventsAPI.Services.GraphSync;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +19,12 @@ builder.Services.AddSwaggerGen();
 // Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Hangfire (Background Jobs)
+var hangfireConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddHangfire(config =>
+    config.UseSqlServerStorage(hangfireConnection));
+builder.Services.AddHangfireServer();
 
 // Authentication - JWT
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -56,6 +66,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+// App Services
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<IGraphSyncService, GraphSyncService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -70,6 +84,7 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseHangfireDashboard("/jobs");
 
 // Run migrations and seed basic data
 using (var scope = app.Services.CreateScope())
@@ -91,5 +106,8 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 }
+
+// Recurring job (hourly students sync)
+RecurringJob.AddOrUpdate<IGraphSyncService>("sync-students", svc => svc.SyncStudentsAsync(CancellationToken.None), Cron.Hourly);
 
 app.Run();

@@ -23,7 +23,9 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.DisplayName).IsRequired().HasMaxLength(200);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.GraphUserId).HasMaxLength(100);
             entity.HasIndex(e => e.Email);
+            entity.HasIndex(e => e.GraphUserId);
         });
 
         modelBuilder.Entity<Event>(entity =>
