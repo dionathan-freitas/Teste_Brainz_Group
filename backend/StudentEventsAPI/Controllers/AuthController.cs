@@ -11,12 +11,12 @@ namespace StudentEventsAPI.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
-    private readonly TokenService _tokenService;
+    private readonly ITokenService _tokenService;
 
-    public AuthController(ApplicationDbContext db, IConfiguration config)
+    public AuthController(ApplicationDbContext db, ITokenService tokenService)
     {
         _db = db;
-        _tokenService = new TokenService(config);
+        _tokenService = tokenService;
     }
 
     [HttpPost("login")]

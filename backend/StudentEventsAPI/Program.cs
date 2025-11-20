@@ -87,7 +87,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IGraphSyncService, GraphSyncService>();
 builder.Services.AddScoped<IEventListingService, EventListingService>();
 builder.Services.AddScoped<IStudentListingService, StudentListingService>();
