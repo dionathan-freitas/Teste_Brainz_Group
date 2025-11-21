@@ -75,7 +75,10 @@ export default function StudentEventsPage() {
           <>
             {student && (
               <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-2">{student.displayName}</h2>
+                <h2 className="text-xl font-semibold mb-2">
+                  {student.displayName}
+                  <span className="text-sm text-gray-600 ml-3">({events.length} evento{events.length !== 1 ? 's' : ''})</span>
+                </h2>
                 <p className="text-gray-600">{student.email}</p>
                 {student.department && (
                   <p className="text-sm text-gray-500 mt-1">Departamento: {student.department}</p>

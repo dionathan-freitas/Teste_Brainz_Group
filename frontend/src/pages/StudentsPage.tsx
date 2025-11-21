@@ -9,6 +9,7 @@ export default function StudentsPage() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -25,9 +26,10 @@ export default function StudentsPage() {
     setLoading(true);
     setError('');
     try {
-      const result = await studentService.getStudents(page, pageSize, search || undefined, department || undefined);
-      setStudents(result.data);
-      setTotalPages(result.totalPages);
+    const result = await studentService.getStudents(page, pageSize, search || undefined, department || undefined);
+    setStudents(result.data);
+    setTotalPages(result.totalPages);
+    setTotalCount(result.totalCount ?? 0);
     } catch (err: any) {
       if (err.response?.status === 401) {
         authService.logout();
@@ -63,7 +65,10 @@ export default function StudentsPage() {
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Student Events</h1>
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-2xl font-bold text-gray-900">Student Events</h1>
+            <span className="text-sm text-gray-600">{totalCount} estudante{totalCount !== 1 ? 's' : ''}</span>
+          </div>
           <button
             onClick={handleLogout}
             className="text-sm text-gray-600 hover:text-gray-900"
@@ -136,47 +141,49 @@ export default function StudentsPage() {
         ) : (
           <>
             <div className="bg-white rounded-lg shadow overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nome
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Departamento
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {students.map((student) => (
-                    <tr key={student.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {student.displayName}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {student.email}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {student.department || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => navigate(`/students/${student.id}/events`)}
-                          className="text-blue-600 hover:text-blue-900 font-medium"
-                        >
-                          Ver eventos
-                        </button>
-                      </td>
+              {/* Desktop / large screens: table */}
+              <div className="hidden md:block">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {students.map((student) => (
+                      <tr key={student.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.displayName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.department || '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <button onClick={() => navigate(`/students/${student.id}/events`)} className="text-blue-600 hover:text-blue-900 font-medium">Ver eventos</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile: cards */}
+              <div className="md:hidden p-4 space-y-3">
+                {students.map((student) => (
+                  <div key={student.id} className="bg-white border rounded-lg p-4 shadow-sm">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">{student.displayName}</div>
+                        <div className="text-xs text-gray-500">{student.email}</div>
+                        <div className="text-xs text-gray-500 mt-1">{student.department || '-'}</div>
+                      </div>
+                      <div>
+                        <button onClick={() => navigate(`/students/${student.id}/events`)} className="text-blue-600 hover:text-blue-800 text-sm">Ver eventos</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {totalPages > 1 && (
