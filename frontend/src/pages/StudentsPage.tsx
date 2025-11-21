@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { studentService, authService } from '../services/api';
 import StudentCard from '../components/StudentCard';
@@ -15,6 +15,7 @@ export default function StudentsPage() {
   const [department, setDepartment] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [deptInput, setDeptInput] = useState('');
+  const debounceRef = useRef<number | null>(null);
   const navigate = useNavigate();
 
   const pageSize = 10;
@@ -24,6 +25,21 @@ export default function StudentsPage() {
   useEffect(() => {
     loadStudents();
   }, [page, search, department]);
+
+  // Debounce inputs for search/department for smoother UX
+  useEffect(() => {
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = window.setTimeout(() => {
+      setSearch(searchInput);
+      setDepartment(deptInput);
+      setPage(1);
+    }, 400); // 400ms debounce
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [searchInput, deptInput]);
 
   const loadStudents = async () => {
     setLoading(true);
@@ -46,6 +62,8 @@ export default function StudentsPage() {
   };
 
   const handleSearch = () => {
+    // Immediate apply ignoring debounce
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
     setSearch(searchInput);
     setDepartment(deptInput);
     setPage(1);
@@ -66,6 +84,7 @@ export default function StudentsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200">
+      <a href="#conteudo" className="sr-only focus:not-sr-only focus:underline">Ir para conteúdo</a>
       <div className="navbar glass-effect shadow-2xl sticky top-0 z-50">
         <div className="flex-1">
           <a className="btn btn-ghost text-xl elegant-title">Student Events</a>
@@ -83,7 +102,7 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <main id="conteudo" className="container mx-auto px-4 py-8 max-w-7xl" aria-busy={loading}>
         <div className="elegant-card mb-6 border-t-4 border-primary">
           <div className="card-body">
             <h2 className="card-title text-2xl mb-4 elegant-title">🔍 Filtros</h2>
@@ -140,9 +159,47 @@ export default function StudentsPage() {
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-            <p className="mt-4 text-base-content/70">Carregando...</p>
+          <div className="elegant-card mb-6 border-l-4 border-info" aria-label="Carregando estudantes" role="status" aria-live="polite">
+            <div className="card-body">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="skeleton h-10 w-48"></div>
+                <div className="skeleton h-10 w-24"></div>
+              </div>
+              {/* Skeleton table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="table w-full" aria-hidden="true">
+                  <thead>
+                    <tr>
+                      <th><div className="skeleton h-4 w-20"></div></th>
+                      <th><div className="skeleton h-4 w-24"></div></th>
+                      <th><div className="skeleton h-4 w-24"></div></th>
+                      <th><div className="skeleton h-4 w-16"></div></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: pageSize }).map((_, i) => (
+                      <tr key={i}>
+                        <td><div className="skeleton h-4 w-36"></div></td>
+                        <td><div className="skeleton h-4 w-40"></div></td>
+                        <td><div className="skeleton h-4 w-28"></div></td>
+                        <td><div className="skeleton h-8 w-24"></div></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {/* Mobile skeleton cards */}
+              <div className="md:hidden grid grid-cols-1 gap-4" aria-hidden="true">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="elegant-card p-4">
+                    <div className="skeleton h-6 w-40 mb-2"></div>
+                    <div className="skeleton h-4 w-48 mb-2"></div>
+                    <div className="skeleton h-4 w-24 mb-4"></div>
+                    <div className="skeleton h-8 w-32"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : students.length === 0 ? (
           <div className="card bg-base-100 shadow-xl">
@@ -175,7 +232,7 @@ export default function StudentsPage() {
                     </thead>
                     <tbody>
                       {students.map((student) => (
-                        <tr key={student.id} className="hover">
+                        <tr key={student.id} className="hover" aria-label={`Estudante ${student.displayName}`}>
                           <td className="font-medium">{student.displayName}</td>
                           <td className="text-base-content/70">{student.email}</td>
                           <td>
@@ -189,6 +246,7 @@ export default function StudentsPage() {
                             <button 
                               onClick={() => navigate(`/students/${student.id}/events`)} 
                               className="btn btn-primary btn-sm"
+                              aria-label={`Ver eventos de ${student.displayName}`}
                             >
                               Ver eventos
                             </button>
@@ -219,6 +277,7 @@ export default function StudentsPage() {
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="join-item btn btn-outline"
+                    aria-label="Página anterior"
                   >
                     « Anterior
                   </button>
@@ -229,6 +288,7 @@ export default function StudentsPage() {
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
                     className="join-item btn btn-outline"
+                    aria-label="Próxima página"
                   >
                     Próxima »
                   </button>

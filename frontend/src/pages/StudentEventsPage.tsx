@@ -70,9 +70,47 @@ export default function StudentEventsPage() {
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-            <p className="mt-4 text-base-content/70">Carregando...</p>
+          <div className="elegant-card mb-6 border-l-4 border-info" role="status" aria-label="Carregando eventos" aria-live="polite">
+            <div className="card-body">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="skeleton h-8 w-56"></div>
+                <div className="skeleton h-8 w-24"></div>
+              </div>
+              <div className="overflow-x-auto hidden md:block">
+                <table className="table w-full" aria-hidden="true">
+                  <thead>
+                    <tr>
+                      <th><div className="skeleton h-4 w-20"></div></th>
+                      <th><div className="skeleton h-4 w-16"></div></th>
+                      <th><div className="skeleton h-4 w-16"></div></th>
+                      <th><div className="skeleton h-4 w-24"></div></th>
+                      <th><div className="skeleton h-4 w-16"></div></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <tr key={i}>
+                        <td><div className="skeleton h-4 w-40"></div></td>
+                        <td><div className="skeleton h-4 w-28"></div></td>
+                        <td><div className="skeleton h-4 w-28"></div></td>
+                        <td><div className="skeleton h-4 w-32"></div></td>
+                        <td><div className="skeleton h-4 w-20"></div></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="md:hidden grid grid-cols-1 gap-4" aria-hidden="true">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="elegant-card p-4">
+                    <div className="skeleton h-6 w-48 mb-3"></div>
+                    <div className="skeleton h-4 w-40 mb-2"></div>
+                    <div className="skeleton h-4 w-32 mb-2"></div>
+                    <div className="skeleton h-4 w-24"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : error ? (
           <div className="alert alert-error shadow-lg">

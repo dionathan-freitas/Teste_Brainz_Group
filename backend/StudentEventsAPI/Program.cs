@@ -5,7 +5,7 @@ using Hangfire;
 using Hangfire.SqlServer;
 using System.Text;
 using StudentEventsAPI.Data;
-using StudentEventsAPI.Models;
+using DomainModels = StudentEventsAPI.Models;
 using StudentEventsAPI.Services;
 using StudentEventsAPI.Services.GraphSync;
 using StudentEventsAPI.Services.Events;
@@ -21,25 +21,35 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    var securityScheme = new OpenApiSecurityScheme
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Student Events API",
+        Version = "v1",
+        Description = "API para gerenciamento de eventos e estudantes sincronizados via Microsoft Graph"
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Description = "Informe o token JWT começando com Bearer. Ex: 'Bearer {seu_token}'",
-        In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
-        Reference = new OpenApiReference
-        {
-            Id = "Bearer",
-            Type = ReferenceType.SecurityScheme
-        }
-    };
+        In = ParameterLocation.Header,
+        Description = "Insira o token JWT no formato: Bearer {token}"
+    });
 
-    options.AddSecurityDefinition("Bearer", securityScheme);
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { securityScheme, new List<string>() }
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            }, new List<string>()
+        }
     });
 });
 

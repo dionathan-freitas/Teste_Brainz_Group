@@ -1,328 +1,219 @@
-# Teste Brainz Group - Student Events
+<div align="center">
+	<h1>Student Events – Desafio FullStack Brainz Group</h1>
+	<p>Solução completa: .NET 8 Web API + React (Vite + TS) para gerenciamento de estudantes e eventos sincronizados via Microsoft Graph.</p>
+	<img alt="Stack" src="https://img.shields.io/badge/.NET%208-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" />
+	<img alt="React" src="https://img.shields.io/badge/React-149ECA?style=for-the-badge&logo=react&logoColor=white" />
+	<img alt="Tailwind" src="https://img.shields.io/badge/TailwindCSS-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" />
+	<img alt="SQL Server" src="https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white" />
+</div>
 
-Este repositório contém uma API em .NET 8 (Web API) e um frontend em React + Vite + TypeScript que listam estudantes e seus eventos.
+---
 
-## Recursos implementados
-- Backend (.NET 8): EF Core (SQL Server), JWT Bearer Authentication, Swagger, Hangfire para jobs agendados.
-- Frontend: React + Vite + TypeScript, Tailwind CSS, páginas de login, listagem de estudantes e visualização de eventos.
-- Scripts de apoio: scripts PowerShell para login, seed e verificações (`/scripts`).
+## Visão Geral
+| Camada | Tecnologias | Destaques |
+|--------|-------------|-----------|
+| Backend | .NET 8, EF Core, SQL Server, JWT, Hangfire, Swagger | Sincronização agendada, seed de dados, filtros e paginação |
+| Frontend | React + Vite + TypeScript, Tailwind + DaisyUI | Design responsivo, loading skeletons, acessibilidade básica |
+| Infra | Docker (SQL Server), PowerShell scripts | Inicialização rápida, automação de seed e sync |
+| Testes | xUnit (serviços de domínio) | 18 testes cobrindo filtros, paginação e agregações |
 
-## Requisitos
-- .NET 8 SDK
-- Node.js
-- Docker (opcional, recomendado para rodar SQL Server)
+---
+## Estrutura
+```
+backend/StudentEventsAPI            # Web API (.NET 8)
+backend/StudentEventsAPI.Tests      # Testes xUnit
+frontend/                           # Aplicação React/Vite
+scripts/                            # Automação (PowerShell)
+docker-compose.yml                  # SQL Server
+```
 
-## Como rodar localmente
+---
+##  Credenciais de Desenvolvimento
+| Usuário | Senha | Perfil |
+|---------|-------|--------|
+| admin   | admin123 | Admin |
 
-1) Iniciar banco com Docker (opcional)
-
+---
+## Setup Rápido
 ```powershell
-# na raiz do projeto
+# 1. Subir SQL Server
 docker compose up -d
-```
 
-Container padrão criado: `sqlserver-brainz` (porta 1433). A senha SA usada no `docker-compose.yml` é `YourStrong@Password123`.
-
-2) Configurar user-secrets (recomendado)
-
-```powershell
-# no diretório backend
+# 2. Configurar segredos (no diretório da API)
 cd backend/StudentEventsAPI
 dotnet user-secrets init
-# Defina ConnectionStrings e Jwt key (exemplo):
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=StudentEventsDB;User Id=sa;Password=YourStrong@Password123;TrustServerCertificate=true;MultipleActiveResultSets=true"
-dotnet user-secrets set "Jwt:Key" "<sua-chave-secreta-com-~32+ caracteres>"
-```
-
-3) Rodar a API
-
-```powershell
-# na raiz
-cd backend/StudentEventsAPI
-dotnet run
-```
-
-A API roda por padrão em `http://localhost:5035` (veja `Properties/launchSettings.json`).
-
-4) Rodar o frontend
-
-```powershell
-cd frontend
-npm install
-npm run dev
-```
-
-O frontend roda em `http://localhost:5173`.
-
-## Credenciais padrão
-- Usuário: `admin`
-- Senha: `admin123`
-
-## Popular dados de teste
-
-Depois de iniciar a API (e garantir que a connection string está correta), possibilitamos um endpoint de desenvolvimento para povoar dados de exemplo:
-
-```powershell
-# Executar no PowerShell (arquivo já presente em scripts)
-# Seed exemplo (usa o admin para autenticar):
-cd scripts
-powershell -ExecutionPolicy Bypass -File .\seed_sample.ps1
-```
-
-Também há scripts para verificar os dados:
-- `fetch_students_post_seed.ps1` — retorna a lista de estudantes
-- `fetch_first_student_events.ps1` — retorna eventos do primeiro estudante
-
-## Testes
-
-- Backend: projeto de testes `StudentEventsAPI.Tests` (xUnit). Rodar em:
-
-```powershell
-cd backend
-dotnet test
-```
-
-- Frontend: ainda não há testes configurados; podemos adicionar Vitest se desejado.
-
-## Observações
-- As credenciais do Microsoft Graph foram mascaradas no repositório. Para sincronização real com Graph, defina `MicrosoftGraph:ClientId`, `ClientSecret` e `TenantId` via user-secrets.
-- O endpoint `/api/dev/seed-sample` existe apenas para facilitar testes locais e é protegido por role `Admin`.
-
-## Próximos passos
-- Polir UI e adicionar testes frontend (Vitest).
-- Adicionar CI (GitHub Actions) para rodar testes e build.
-
-Boa sorte — se quiser, eu posso preparar o push final para o GitHub e criar o README em português mais detalhado.
-
-# Desafio Técnico - FullStack Developer
-
-Sistema de gerenciamento de estudantes e eventos integrado com Microsoft Graph API.
-
-##  Tecnologias
-
-### Frontend
-- React 18
-- Vite
-- TypeScript
-- Tailwind CSS
-
-### Backend
-- .NET 8 Web API
-- Entity Framework Core
-- SQL Server
-- JWT Authentication
-- Hangfire (sincronização periódica)
-
-##  Funcionalidades
-
-- Autenticação de usuários
-- Listagem de estudantes
-- Visualização de eventos por estudante
-- Sincronização automática com Microsoft Graph
-
-## 🔧 Como executar
-
-### Pré-requisitos
-- Docker Desktop instalado e rodando
-- .NET 8 SDK
-
-### 1. Banco de Dados (SQL Server via Docker)
-
-Na raiz do projeto:
-```powershell
-docker-compose up -d
-```
-
-Isso iniciará SQL Server 2022 em `localhost:1433` com:
-- User: `sa`
-- Password: `@Password123`
-- Database: será criada automaticamente pela API
-
-Para parar o container:
-```powershell
-docker-compose down
-```
-
-### 2. Backend API
-
-1. Acesse a pasta da API:
-```powershell
-cd backend/StudentEventsAPI
-```
-2. Configure user-secrets (obrigatório em dev – valores foram removidos de `appsettings.json`):
-```
-dotnet user-secrets init
-dotnet user-secrets set "Jwt:Key" "<sua-chave-forte>"
+dotnet user-secrets set "Jwt:Key" "<chave-super-secreta-long>"
+# (Opcional para Graph)
 dotnet user-secrets set "MicrosoftGraph:ClientId" "<client-id>"
 dotnet user-secrets set "MicrosoftGraph:ClientSecret" "<client-secret>"
 dotnet user-secrets set "MicrosoftGraph:TenantId" "<tenant-id>"
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=StudentEventsDB;User Id=sa;Password=<SuaSenhaForte>;TrustServerCertificate=true;MultipleActiveResultSets=true"
-```
-Se qualquer chave permanecer como `__SECRET__` em runtime a aplicação poderá falhar nas operações que dependem da configuração (JWT ou Graph).
-3. Executar a API:
-```powershell
-dotnet run
-```
-4. Testar saúde:
-```
-GET http://localhost:5099/health
-```
-5. Login inicial (seed admin):
-```
-POST http://localhost:5099/api/auth/login
-Body: {"username":"admin","password":"admin123"}
-```
-6. Usar token Bearer para acessar estudantes:
-```
-GET http://localhost:5099/api/students
-```
 
-Próximas seções (Front-end, sync Graph, testes) serão adicionadas conforme implementação.
+# 3. Inicializar backend com build, migrations, testes e seed
+cd ../../scripts
+./init_backend.ps1
 
-## 🔌 Endpoints iniciais
+# 4. Rodar frontend
+./run_frontend.ps1
+```
+API: http://localhost:5035  |  Frontend: http://localhost:5173  |  Swagger: http://localhost:5035/swagger  | Jobs Hangfire: http://localhost:5035/jobs
 
+---
+## Scripts PowerShell
+| Script | Função | Flags |
+|--------|--------|-------|
+| `util_common.ps1` | Funções compartilhadas (login, chamada API, health wait) | — |
+| `init_backend.ps1` | Restore, build, migrations, testes, seed e run | `-SkipTests`, `-SkipSeed`, `-Configuration` |
+| `run_frontend.ps1` | Instala dependências e inicia Vite | `-SkipInstall` |
+| `dev_full.ps1` | Sobe backend e frontend em jobs paralelos | `-SkipInstall`, `-SkipSeed` |
+| `seed_sample.ps1` | Chama endpoint de seed desenvolvimento | — |
+| `fetch_students_post_seed.ps1` | Recupera lista de estudantes | — |
+| `fetch_first_student_events.ps1` | Mostra eventos do primeiro estudante | — |
+| `sync_and_check.ps1` | Health + login + força sync (students/events) | — |
+| `login_and_get_debug.ps1` | Depuração login + requisição students | — |
+| `post_login_debug.ps1` | Depuração bruta da resposta de login | — |
+
+Defina `STUDENT_EVENTS_API` para alterar o BaseUrl se necessário.
+
+---
+## Endpoints Principais
 | Método | Rota | Descrição | Auth |
 |--------|------|-----------|------|
-| GET | /health | Verifica status da API | Livre |
-| POST | /api/auth/login | Autentica e retorna JWT | Livre |
-| GET | /api/students | Lista estudantes paginada | Bearer |
-| GET | /api/students/{id}/events | Todos os eventos do estudante | Bearer |
-| GET | /api/events | Lista global de eventos (paginado) | Bearer |
-| POST | /api/sync/students | Força sync de usuários Graph | Admin |
-| POST | /api/sync/events | Força sync de eventos Graph | Admin |
+| GET | /health | Verifica status geral | Público |
+| POST | /api/auth/login | Autentica e retorna JWT | Público |
+| GET | /api/students | Lista estudantes (paginação + filtros) | Bearer |
+| GET | /api/students/{id}/events | Eventos de um estudante | Bearer |
+| GET | /api/events | Lista global de eventos | Bearer |
+| POST | /api/sync/students | Força sincronização de usuários Graph | Admin |
+| POST | /api/sync/events | Força sincronização de eventos Graph | Admin |
+| GET | /jobs | Dashboard Hangfire | Admin |
 
-### Parâmetros de Paginação & Filtros
-
-Students (`GET /api/students`):
+### Paginação & Filtros
+`/api/students`:
 ```
-page (int >=1)
-pageSize (int >=1)
-search (opcional) - nome ou email (contains)
-department (opcional) - match exato do departamento
-```
-
-Events (`GET /api/events`):
-```
-page, pageSize (obrigatórios)
-studentId (opcional) - restringe a um estudante
-start (opcional, ISO 8601) - filtra início >= start
-end (opcional, ISO 8601)   - filtra fim <= end
-search (opcional) - busca em subject ou location
+page, pageSize (>=1)
+search (contains em nome/email)
+department (contains)
 ```
 
-Exemplo:
+`/api/events`:
 ```
-GET /api/events?page=1&pageSize=20&start=2025-01-01&end=2025-01-31&search=reunião
+page, pageSize
+studentId (exato)
+startDate, endDate (DateTime ISO)
+search (subject/location)
 ```
 
-Student Events (`GET /api/students/{id}/events`): retorna todos os eventos do estudante ordenados por data ascendente (sem paginação ainda, otimização futura possível).
-
-### Sincronização Manual vs Automática
-- Automática: Hangfire job `sync-students` executa de hora em hora (`Cron.Hourly`). Pode ser ajustado em `Program.cs`.
-- Manual: endpoints `/api/sync/students` e `/api/sync/events` (requer usuário com role Admin). Útil para testes ou após alterar a janela de sincronização.
-
-### Janela de Sincronização de Eventos
-Configurável em `appsettings.json` (seção `Sync`) ou via outros providers:
-```
-"Sync": {
-	"MonthsPast": 1,
-	"MonthsFuture": 3
+### Retornos
+Todos os listagens usam `PaginatedResult<T>`:
+```json
+{
+	"data": [...],
+	"page": 1,
+	"pageSize": 10,
+	"totalCount": 42,
+	"totalPages": 5
 }
 ```
-GraphSyncService buscará eventos dentro de `[UtcNow - MonthsPast .. UtcNow + MonthsFuture]`.
 
-### Segurança do Dashboard Hangfire
-- Rota: `/jobs`
-- Protegido por filtro que exige usuário autenticado com role `Admin`.
-Adicionar autorização ao chamar: incluir header `Authorization: Bearer <token-admin>`.
-
-### Migrations & Evolução de Schema
-- Primeira migration: `InitialCreate` já gerada.
-- Aplicação chama `Database.MigrateAsync()` em startup (DataSeeder).
-- Nova alteração de modelo:
-```
-dotnet ef migrations add AddCampoX
-dotnet ef database update
-```
-Commitar a migration para manter histórico.
-
-##  Sincronização – Esqueleto Implementado
-
-Status:
-- Serviço `GraphSyncService` criado (sincroniza usuários do Microsoft Graph -> Students)
-- Propriedade `GraphUserId` adicionada ao modelo `Student` para vínculo permanente
-- Job recorrente Hangfire configurado (`sync-students`) executa de hora em hora
-- Dashboard Hangfire disponível em `/jobs` (proteção futura via auth a definir)
-- Próximo passo: implementar sincronização de eventos (calendário) por usuário
-
-Fluxo atual (usuários):
-1. Obtém até 50 usuários do Graph (`displayName`, `mail`, `department`)
-2. Faz upsert (inclusão ou atualização) na tabela Students
-3. Atualiza `LastSyncDate` para cada registro processado
-
-Planejado para eventos:
-- Ler calendários / eventos futuros por usuário
-- Persistir em tabela Events vinculada ao Student
-- Otimização: evitar reprocessar eventos antigos (janela de tempo configurável)
-
-Frequência (temporária): hourly via `Cron.Hourly` – poderá ser ajustada conforme necessidade.
-
-### 3. Frontend React
-
-1. Acesse a pasta do frontend:
-```powershell
-cd frontend
-```
-2. Instalar dependências (primeira vez):
-```powershell
-npm install
-```
-3. Executar em modo de desenvolvimento:
-```powershell
-npm run dev
-```
-Aplicação estará disponível em `http://localhost:5173`
-
-4. Build de produção:
-```powershell
-npm run build
+---
+## Sincronização (Hangfire)
+Job recorrente: `sync-students` (hourly). Configuração em `Program.cs`.
+Janela de eventos (planejada): seção `Sync` em `appsettings`:
+```json
+"Sync": { "MonthsPast": 1, "MonthsFuture": 3 }
 ```
 
-**Funcionalidades**:
-- Login (`/login`) com admin/admin123
-- Listagem paginada de estudantes com busca e filtro por departamento
-- Visualização dos eventos de cada estudante (ordenados por data)
-- Responsivo (mobile/tablet/desktop)
-- Proteção de rotas com JWT
+Dashboard protegido em `/jobs` (requere JWT com role Admin).
 
-##  Estrutura do Projeto
-
-```
-/frontend - Aplicação React + Vite + TypeScript + Tailwind
-/backend  - API .NET 8
-/backend/StudentEventsAPI.Tests - Projeto de testes (xUnit)
-```
-
-##  Testes
-
-### Backend
-Executar todos os testes:
+---
+## Testes Backend
 ```powershell
 dotnet test
 ```
-Gerar relatório TRX para CI:
-```powershell
-dotnet test --logger "trx;LogFileName=test_results.trx"
-```
-Estratégia de cobertura inicial:
-- `TokenService` (formato e claims do JWT)
-- `StudentListingService` (paginação + filtros search/department)
-- `EventListingService` (filtros de data, studentId, search e ordenação ascendente)
-- `StudentEventsService` (ordenar eventos de um estudante)
+Cobertura (18 testes):
+- Paginação e filtros de estudantes (search/department)
+- Paginação e filtros de eventos (date range, studentId, search)
+- Agregação de eventos por estudante
+- Ordenações (StartDate asc)
 
-Para adicionar novos testes de schema ou lógica:
+Para nova migration:
 ```powershell
-dotnet ef migrations add NovaAlteracao
+dotnet ef migrations add NomeAlteracao
 dotnet ef database update
 dotnet test
 ```
+
+---
+## UX & Acessibilidade
+Melhorias aplicadas:
+- Debounce (400ms) em filtros de busca e departamento (lista de estudantes)
+- Skeleton loaders para listas (desktop e mobile)
+- Skip link ("Ir para conteúdo") para navegação assistiva
+- ARIA atributos em botões e listagens
+- Layout responsivo com cards no mobile e tabela em desktop
+
+Próximos incrementos sugeridos:
+- Foco visível aprimorado em componentes interativos
+- Toasts para erros (substituir alert inline)
+- Paginação acessível com `aria-current`
+
+---
+## Segurança
+- JWT Bearer com validação de emissor/audiência e chave simétrica.
+- Swagger configurado com esquema Bearer.
+- Dashboard Hangfire exige autenticação + role Admin.
+
+---
+## Arquitetura Backend (Resumo)
+| Camada | Pastas |
+|--------|--------|
+| Models | `Models` (Student, Event) |
+| DTOs | `DTOs` (EventDto, StudentDto, PaginatedResult) |
+| Services | `Services/Students`, `Services/Events`, `Services/GraphSync` |
+| Infra | `Data` (DbContext), `Infrastructure` (Auth filtro Hangfire) |
+| Options | `Options/SyncOptions` para janela de sincronização |
+
+Mapping via extension methods (ex.: `ToDto()`), isolando projeção de entidades.
+
+---
+## Frontend
+| Página | Descrição |
+|--------|-----------|
+| `/login` | Autenticação e armazenamento do token |
+| `/students` | Lista paginada + filtros com debounce |
+| `/students/:id/events` | Eventos do estudante selecionado |
+
+Proteção de rotas via componente `ProtectedRoute`.
+
+---
+## Microsoft Graph (Planejado/Esqueleto)
+Serviço `GraphSyncService` preparado para:
+1. Buscar usuários (displayName, mail, department)
+2. Fazer upsert em Students
+3. Registrar data de sincronização (`LastSyncDate`)
+
+Extensão para eventos (calendário) pode seguir padrão similar usando janela de datas configurável.
+
+---
+## Licença
+Uso interno para avaliação técnica. Não inclui credenciais reais.
+
+---
+## Roadmap Futuro (Sugerido)
+- Testes frontend (Vitest + Testing Library)
+- CI/CD (GitHub Actions: build + test + lint)
+- Cache em listagens (Redis / MemoryCache) para alta escala
+- Edição de estudantes / eventos (CRUD completo)
+- Webhook Graph para mudanças em tempo real
+
+---
+## Troubleshooting Rápido
+| Problema | Causa Comum | Solução |
+|----------|-------------|---------|
+| 401 em endpoints | Token ausente ou expirado | Refazer login / verificar `Jwt:Key` |
+| Conexão negada SQL | Docker não iniciado | `docker compose up -d` |
+| Seed falha | Endpoint dev não habilitado ou token inválido | Conferir role Admin do usuário |
+| Swagger sem botão Authorize | Pacotes incompatíveis | Verificar versão Swashbuckle (6.5.0) |
+
+---
