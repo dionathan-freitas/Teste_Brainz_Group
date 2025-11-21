@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate } from 'react-router-dom';
 import { studentService, authService } from '../services/api';
 import type { Student, Event } from '../types';
 
 export default function StudentEventsPage() {
-  const { studentId } = useParams<{ studentId: string }>();
+  const { studentId } = useParams();
   const [student, setStudent] = useState<Student | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,81 +50,134 @@ export default function StudentEventsPage() {
   const formatCount = (n: number) => n.toLocaleString();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
-          <button
-            type="button"
-            aria-label="Voltar para a lista de estudantes"
-            onClick={() => navigate('/students')}
-            className="text-blue-600 hover:text-blue-800"
+    <div className="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200">
+      <div className="navbar glass-effect shadow-2xl sticky top-0 z-50">
+        <div className="flex-1">
+          <button 
+            type="button" 
+            aria-label="Voltar para a lista de estudantes" 
+            onClick={() => navigate('/students')} 
+            className="btn btn-ghost btn-sm elegant-btn"
           >
-            ← Voltar
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Voltar
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">Eventos do Estudante</h1>
+          <h1 className="text-xl elegant-title ml-4">📅 Eventos do Estudante</h1>
         </div>
-      </nav>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-gray-600">Carregando...</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
+            <p className="mt-4 text-base-content/70">Carregando...</p>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+          <div className="alert alert-error shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
           </div>
         ) : (
           <>
             {student && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-2">
-                  {student.displayName}
-                  <span className="text-sm text-gray-600 ml-3" aria-live="polite">({formatCount(events.length)} evento{events.length !== 1 ? 's' : ''})</span>
-                </h2>
-                <p className="text-gray-600">{student.email}</p>
-                {student.department && (
-                  <p className="text-sm text-gray-500 mt-1">Departamento: {student.department}</p>
-                )}
+              <div className="elegant-card mb-6 border-t-4 border-primary">
+                <div className="card-body">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="avatar placeholder">
+                          <div className="bg-gradient-to-br from-primary to-secondary text-neutral-content rounded-full w-16">
+                            <span className="text-2xl font-bold">{student.displayName.charAt(0)}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <h2 className="text-3xl font-bold elegant-title mb-1">{student.displayName}</h2>
+                          <p className="text-base-content/70 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            {student.email}
+                          </p>
+                        </div>
+                      </div>
+                      {student.department && (
+                        <div className="badge badge-accent badge-lg gap-2">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          {student.department}
+                        </div>
+                      )}
+                    </div>
+                    <div className="badge badge-primary badge-lg elegant-btn px-6 py-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {formatCount(events.length)} evento{events.length !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
             {events.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center" role="status" aria-live="polite">
-                <p className="text-gray-500">Nenhum evento encontrado para este estudante</p>
+              <div className="card bg-base-100 shadow-xl">
+                <div className="card-body items-center text-center" role="status" aria-live="polite">
+                  <p className="text-base-content/60">Nenhum evento encontrado para este estudante</p>
+                </div>
               </div>
             ) : (
-              <div className="space-y-4" role="list" aria-label="Lista de eventos">
-                {events.map((event) => (
-                  <div key={event.id} id={`event-${event.id}`} role="listitem" className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h3 id={`event-${event.id}-title`} className="text-lg font-semibold text-gray-900 mb-2">
-                          {event.subject}
-                        </h3>
-                        <div className="space-y-1 text-sm text-gray-600">
-                          <p>
-                            <span className="font-medium">Início:</span> {formatDateTime(event.startDateTime)}
-                          </p>
-                          <p>
-                            <span className="font-medium">Fim:</span> {formatDateTime(event.endDateTime)}
-                          </p>
-                          {event.location && (
-                            <p>
-                              <span className="font-medium">Local:</span> {event.location}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      {event.isOnlineMeeting && (
-                        <span className="ml-4 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full" aria-hidden="true">
-                          Online
-                        </span>
-                      )}
-                    </div>
+              <div className="elegant-card border-l-4 border-secondary">
+                <div className="card-body">
+                  <h3 className="card-title text-2xl mb-6 elegant-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    Lista de Eventos
+                  </h3>
+                  <div className="overflow-x-auto">
+                    <table className="table table-zebra" role="list" aria-label="Lista de eventos">
+                      <thead>
+                        <tr>
+                          <th>Evento</th>
+                          <th>Início</th>
+                          <th>Fim</th>
+                          <th>Local</th>
+                          <th>Tipo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {events.map((event) => (
+                          <tr key={event.id} className="hover" role="listitem">
+                            <td>
+                              <div className="font-semibold">{event.subject}</div>
+                            </td>
+                            <td className="text-sm">{formatDateTime(event.startDateTime)}</td>
+                            <td className="text-sm">{formatDateTime(event.endDateTime)}</td>
+                            <td className="text-sm">
+                              {event.location ? (
+                                <span>{event.location}</span>
+                              ) : (
+                                <span className="text-base-content/50">-</span>
+                              )}
+                            </td>
+                            <td>
+                              {event.isOnlineMeeting ? (
+                                <div className="badge badge-info badge-sm">Online</div>
+                              ) : (
+                                <div className="badge badge-ghost badge-sm">Presencial</div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
-                ))}
+                </div>
               </div>
             )}
           </>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { studentService, authService } from '../services/api';
+import StudentCard from '../components/StudentCard';
 import type { Student } from '../types';
 
 export default function StudentsPage() {
@@ -64,157 +65,174 @@ export default function StudentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">Student Events</h1>
-            <span className="text-sm text-gray-600" aria-live="polite">{formatCount(totalCount)} estudante{totalCount !== 1 ? 's' : ''}</span>
+    <div className="min-h-screen bg-gradient-to-br from-base-200 via-base-100 to-base-200">
+      <div className="navbar glass-effect shadow-2xl sticky top-0 z-50">
+        <div className="flex-1">
+          <a className="btn btn-ghost text-xl elegant-title">Student Events</a>
+          <div className="badge badge-primary badge-lg ml-3 elegant-btn" aria-live="polite">
+            {formatCount(totalCount)} estudante{totalCount !== 1 ? 's' : ''}
           </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
+        </div>
+        <div className="flex-none">
+          <button onClick={handleLogout} className="btn btn-ghost btn-sm elegant-btn hover:btn-error">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
             Sair
           </button>
         </div>
-      </nav>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Filtros</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Buscar por nome ou email
-              </label>
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Digite para buscar..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Departamento
-              </label>
-              <input
-                type="text"
-                value={deptInput}
-                onChange={(e) => setDeptInput(e.target.value)}
-                placeholder="Ex: Tech, Biz..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div className="flex items-end gap-2">
-              <button
-                onClick={handleSearch}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                Filtrar
-              </button>
-              <button
-                onClick={handleClear}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none"
-              >
-                Limpar
-              </button>
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="elegant-card mb-6 border-t-4 border-primary">
+          <div className="card-body">
+            <h2 className="card-title text-2xl mb-4 elegant-title">🔍 Filtros</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-medium">Buscar por nome ou email</span>
+                </label>
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Digite para buscar..."
+                  className="input input-bordered w-full"
+                />
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-medium">Departamento</span>
+                </label>
+                <input
+                  type="text"
+                  value={deptInput}
+                  onChange={(e) => setDeptInput(e.target.value)}
+                  placeholder="Ex: Tech, Biz..."
+                  className="input input-bordered w-full"
+                />
+              </div>
+              <div className="flex items-end gap-2">
+                <button onClick={handleSearch} className="btn btn-primary flex-1 elegant-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Filtrar
+                </button>
+                <button onClick={handleClear} className="btn btn-outline flex-1 elegant-btn hover:btn-secondary">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Limpar
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            {error}
+          <div className="alert alert-error shadow-lg mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
           </div>
         )}
 
         {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-gray-600">Carregando...</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <span className="loading loading-spinner loading-lg text-primary"></span>
+            <p className="mt-4 text-base-content/70">Carregando...</p>
           </div>
         ) : students.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-500">Nenhum estudante encontrado</p>
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body items-center text-center">
+              <p className="text-base-content/60">Nenhum estudante encontrado</p>
+            </div>
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <div>
-                  <div className="text-sm text-gray-500">Total</div>
-                  <div className="text-lg font-semibold text-gray-900">{formatCount(totalCount)} estudante{totalCount !== 1 ? 's' : ''}</div>
-                </div>
-                <div className="text-sm text-gray-500">Página {page} de {totalPages}</div>
-              </div>
-              {/* Desktop / large screens: table */}
-              <div className="hidden md:block">
-                <table className="min-w-full divide-y divide-gray-200" role="table" aria-label="Lista de estudantes">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {students.map((student) => (
-                      <tr key={student.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{student.displayName}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.email}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.department || '-'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <button onClick={() => navigate(`/students/${student.id}/events`)} className="text-blue-600 hover:text-blue-900 font-medium">Ver eventos</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile: cards */}
-              <div className="md:hidden p-4 space-y-3">
-                {students.map((student) => (
-                  <div key={student.id} className="bg-white border rounded-lg p-4 shadow-sm">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="text-sm font-semibold text-gray-900">{student.displayName}</div>
-                        <div className="text-xs text-gray-500">{student.email}</div>
-                        <div className="text-xs text-gray-500 mt-1">{student.department || '-'}</div>
-                      </div>
-                      <div>
-                        <button onClick={() => navigate(`/students/${student.id}/events`)} className="text-blue-600 hover:text-blue-800 text-sm">Ver eventos</button>
-                      </div>
-                    </div>
+            <div className="elegant-card mb-6 border-l-4 border-accent">
+              <div className="card-body">
+                <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-gray-100">
+                  <div>
+                    <div className="text-sm text-base-content/60">Total</div>
+                    <div className="text-lg font-semibold">{formatCount(totalCount)} estudante{totalCount !== 1 ? 's' : ''}</div>
                   </div>
-                ))}
+                  <div className="text-sm text-base-content/60">Página {page} de {totalPages}</div>
+                </div>
+                
+                {/* Desktop: table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="table table-zebra w-full" role="table" aria-label="Lista de estudantes">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Departamento</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {students.map((student) => (
+                        <tr key={student.id} className="hover">
+                          <td className="font-medium">{student.displayName}</td>
+                          <td className="text-base-content/70">{student.email}</td>
+                          <td>
+                            {student.department ? (
+                              <div className="badge badge-ghost">{student.department}</div>
+                            ) : (
+                              <span className="text-base-content/50">-</span>
+                            )}
+                          </td>
+                          <td>
+                            <button 
+                              onClick={() => navigate(`/students/${student.id}/events`)} 
+                              className="btn btn-primary btn-sm"
+                            >
+                              Ver eventos
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile: cards */}
+                <div className="md:hidden grid grid-cols-1 gap-4">
+                  {students.map((student) => (
+                    <StudentCard
+                      key={student.id}
+                      student={student}
+                      onViewEvents={(id) => navigate(`/students/${id}/events`)}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
             {totalPages > 1 && (
-              <div className="mt-6 flex justify-center items-center gap-2">
-                <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                >
-                  Anterior
-                </button>
-                <span className="text-sm text-gray-700">
-                  Página {page} de {totalPages}
-                </span>
-                <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                  className="px-3 py-1 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                >
-                  Próxima
-                </button>
+              <div className="flex justify-center">
+                <div className="join">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="join-item btn btn-outline"
+                  >
+                    « Anterior
+                  </button>
+                  <button className="join-item btn btn-outline">
+                    Página {page} de {totalPages}
+                  </button>
+                  <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="join-item btn btn-outline"
+                  >
+                    Próxima »
+                  </button>
+                </div>
               </div>
             )}
           </>

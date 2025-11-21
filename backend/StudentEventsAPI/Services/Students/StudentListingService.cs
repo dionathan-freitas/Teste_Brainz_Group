@@ -24,7 +24,7 @@ public class StudentListingService : IStudentListingService
         if (!string.IsNullOrWhiteSpace(department))
         {
             var depLower = department.ToLower();
-            query = query.Where(s => s.Department != null && s.Department.ToLower() == depLower);
+            query = query.Where(s => s.Department != null && s.Department.ToLower().Contains(depLower));
         }
 
         var total = await query.CountAsync(cancellationToken);

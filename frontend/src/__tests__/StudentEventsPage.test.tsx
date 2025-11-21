@@ -5,8 +5,7 @@ declare const beforeEach: any;
 const vi: any = (globalThis as any).vi ?? { fn: () => {}, mock: () => {} };
 
 import { render, screen, waitFor } from '@testing-library/react';
-import { Route, Routes } from 'react-router';
-import { MemoryRouter } from 'react-router';
+import { Route, Routes, MemoryRouter } from 'react-router-dom';
 
 vi.mock('../services/api', () => {
   return {
