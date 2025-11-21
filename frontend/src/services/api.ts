@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { LoginRequest, LoginResponse, PaginatedResult, Student, Event } from '../types';
 
-const API_BASE_URL = 'http://localhost:5099/api';
+const API_BASE_URL = 'http://localhost:5035/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -20,8 +20,16 @@ api.interceptors.request.use((config) => {
 
 export const authService = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const { data } = await axios.post<LoginResponse>(`${API_BASE_URL}/auth/login`, credentials);
-    return data;
+    const { data } = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
+    // Normalize backend response: support `token` or `accessToken`, and `expiresAt` or `expiresAtUtc`
+    const token = data.token ?? data.accessToken;
+    const expiresAt = data.expiresAt ?? data.expiresAtUtc;
+    return {
+      token,
+      expiresAt,
+      username: data.username,
+      role: data.role,
+    } as LoginResponse;
   },
 
   logout: () => {
