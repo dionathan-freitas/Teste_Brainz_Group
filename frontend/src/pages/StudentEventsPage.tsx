@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { studentService, authService } from '../services/api';
 import type { Student, Event } from '../types';
 
@@ -47,11 +47,15 @@ export default function StudentEventsPage() {
     });
   };
 
+  const formatCount = (n: number) => n.toLocaleString();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center gap-4">
           <button
+            type="button"
+            aria-label="Voltar para a lista de estudantes"
             onClick={() => navigate('/students')}
             className="text-blue-600 hover:text-blue-800"
           >
@@ -77,7 +81,7 @@ export default function StudentEventsPage() {
               <div className="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 className="text-xl font-semibold mb-2">
                   {student.displayName}
-                  <span className="text-sm text-gray-600 ml-3">({events.length} evento{events.length !== 1 ? 's' : ''})</span>
+                  <span className="text-sm text-gray-600 ml-3" aria-live="polite">({formatCount(events.length)} evento{events.length !== 1 ? 's' : ''})</span>
                 </h2>
                 <p className="text-gray-600">{student.email}</p>
                 {student.department && (
@@ -87,16 +91,16 @@ export default function StudentEventsPage() {
             )}
 
             {events.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
+              <div className="bg-white rounded-lg shadow p-12 text-center" role="status" aria-live="polite">
                 <p className="text-gray-500">Nenhum evento encontrado para este estudante</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4" role="list" aria-label="Lista de eventos">
                 {events.map((event) => (
-                  <div key={event.id} className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
+                  <div key={event.id} id={`event-${event.id}`} role="listitem" className="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        <h3 id={`event-${event.id}-title`} className="text-lg font-semibold text-gray-900 mb-2">
                           {event.subject}
                         </h3>
                         <div className="space-y-1 text-sm text-gray-600">
@@ -114,7 +118,7 @@ export default function StudentEventsPage() {
                         </div>
                       </div>
                       {event.isOnlineMeeting && (
-                        <span className="ml-4 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                        <span className="ml-4 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full" aria-hidden="true">
                           Online
                         </span>
                       )}

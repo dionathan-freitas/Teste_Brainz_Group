@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { studentService, authService } from '../services/api';
 import type { Student } from '../types';
 
@@ -17,6 +17,8 @@ export default function StudentsPage() {
   const navigate = useNavigate();
 
   const pageSize = 10;
+
+  const formatCount = (n: number) => n.toLocaleString();
 
   useEffect(() => {
     loadStudents();
@@ -67,9 +69,10 @@ export default function StudentsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-baseline gap-3">
             <h1 className="text-2xl font-bold text-gray-900">Student Events</h1>
-            <span className="text-sm text-gray-600">{totalCount} estudante{totalCount !== 1 ? 's' : ''}</span>
+            <span className="text-sm text-gray-600" aria-live="polite">{formatCount(totalCount)} estudante{totalCount !== 1 ? 's' : ''}</span>
           </div>
           <button
+            type="button"
             onClick={handleLogout}
             className="text-sm text-gray-600 hover:text-gray-900"
           >
@@ -141,15 +144,22 @@ export default function StudentsPage() {
         ) : (
           <>
             <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-gray-500">Total</div>
+                  <div className="text-lg font-semibold text-gray-900">{formatCount(totalCount)} estudante{totalCount !== 1 ? 's' : ''}</div>
+                </div>
+                <div className="text-sm text-gray-500">Página {page} de {totalPages}</div>
+              </div>
               {/* Desktop / large screens: table */}
               <div className="hidden md:block">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200" role="table" aria-label="Lista de estudantes">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departamento</th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">

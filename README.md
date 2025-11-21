@@ -1,3 +1,99 @@
+# Teste Brainz Group - Student Events
+
+Este repositório contém uma API em .NET 8 (Web API) e um frontend em React + Vite + TypeScript que listam estudantes e seus eventos.
+
+## Recursos implementados
+- Backend (.NET 8): EF Core (SQL Server), JWT Bearer Authentication, Swagger, Hangfire para jobs agendados.
+- Frontend: React + Vite + TypeScript, Tailwind CSS, páginas de login, listagem de estudantes e visualização de eventos.
+- Scripts de apoio: scripts PowerShell para login, seed e verificações (`/scripts`).
+
+## Requisitos
+- .NET 8 SDK
+- Node.js
+- Docker (opcional, recomendado para rodar SQL Server)
+
+## Como rodar localmente
+
+1) Iniciar banco com Docker (opcional)
+
+```powershell
+# na raiz do projeto
+docker compose up -d
+```
+
+Container padrão criado: `sqlserver-brainz` (porta 1433). A senha SA usada no `docker-compose.yml` é `YourStrong@Password123`.
+
+2) Configurar user-secrets (recomendado)
+
+```powershell
+# no diretório backend
+cd backend/StudentEventsAPI
+dotnet user-secrets init
+# Defina ConnectionStrings e Jwt key (exemplo):
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=StudentEventsDB;User Id=sa;Password=YourStrong@Password123;TrustServerCertificate=true;MultipleActiveResultSets=true"
+dotnet user-secrets set "Jwt:Key" "<sua-chave-secreta-com-~32+ caracteres>"
+```
+
+3) Rodar a API
+
+```powershell
+# na raiz
+cd backend/StudentEventsAPI
+dotnet run
+```
+
+A API roda por padrão em `http://localhost:5035` (veja `Properties/launchSettings.json`).
+
+4) Rodar o frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+O frontend roda em `http://localhost:5173`.
+
+## Credenciais padrão
+- Usuário: `admin`
+- Senha: `admin123`
+
+## Popular dados de teste
+
+Depois de iniciar a API (e garantir que a connection string está correta), possibilitamos um endpoint de desenvolvimento para povoar dados de exemplo:
+
+```powershell
+# Executar no PowerShell (arquivo já presente em scripts)
+# Seed exemplo (usa o admin para autenticar):
+cd scripts
+powershell -ExecutionPolicy Bypass -File .\seed_sample.ps1
+```
+
+Também há scripts para verificar os dados:
+- `fetch_students_post_seed.ps1` — retorna a lista de estudantes
+- `fetch_first_student_events.ps1` — retorna eventos do primeiro estudante
+
+## Testes
+
+- Backend: projeto de testes `StudentEventsAPI.Tests` (xUnit). Rodar em:
+
+```powershell
+cd backend
+dotnet test
+```
+
+- Frontend: ainda não há testes configurados; podemos adicionar Vitest se desejado.
+
+## Observações
+- As credenciais do Microsoft Graph foram mascaradas no repositório. Para sincronização real com Graph, defina `MicrosoftGraph:ClientId`, `ClientSecret` e `TenantId` via user-secrets.
+- O endpoint `/api/dev/seed-sample` existe apenas para facilitar testes locais e é protegido por role `Admin`.
+
+## Próximos passos
+- Polir UI e adicionar testes frontend (Vitest).
+- Adicionar CI (GitHub Actions) para rodar testes e build.
+
+Boa sorte — se quiser, eu posso preparar o push final para o GitHub e criar o README em português mais detalhado.
+
 # Desafio Técnico - FullStack Developer
 
 Sistema de gerenciamento de estudantes e eventos integrado com Microsoft Graph API.
