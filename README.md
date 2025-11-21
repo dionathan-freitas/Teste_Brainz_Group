@@ -171,10 +171,38 @@ Planejado para eventos:
 
 Frequência (temporária): hourly via `Cron.Hourly` – poderá ser ajustada conforme necessidade.
 
+### 3. Frontend React
+
+1. Acesse a pasta do frontend:
+```powershell
+cd frontend
+```
+2. Instalar dependências (primeira vez):
+```powershell
+npm install
+```
+3. Executar em modo de desenvolvimento:
+```powershell
+npm run dev
+```
+Aplicação estará disponível em `http://localhost:5173`
+
+4. Build de produção:
+```powershell
+npm run build
+```
+
+**Funcionalidades**:
+- Login (`/login`) com admin/admin123
+- Listagem paginada de estudantes com busca e filtro por departamento
+- Visualização dos eventos de cada estudante (ordenados por data)
+- Responsivo (mobile/tablet/desktop)
+- Proteção de rotas com JWT
+
 ##  Estrutura do Projeto
 
 ```
-/frontend - Aplicação React
+/frontend - Aplicação React + Vite + TypeScript + Tailwind
 /backend  - API .NET 8
 /backend/StudentEventsAPI.Tests - Projeto de testes (xUnit)
 ```
